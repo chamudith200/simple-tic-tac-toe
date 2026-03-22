@@ -6,7 +6,8 @@
 typedef struct{
     int board[9];
     uint16_t player_bitmask[2];
-    int player;
+    int current_player;
+    uint16_t wining_masks[8];
 }Game;
 
 enum{
@@ -15,26 +16,25 @@ enum{
     BOARD_P2,
 }PlayerSigns;
 
+
 void game_init(Game *game);
 void print_board(Game *game);
 int mark_player_move(Game *game, int cell, int player);
 int get_user_inputs();
+int check_winner(Game *game, int player);
 
 
 int main() {
     Game game;
     game_init(&game);
 
+    mark_player_move(&game, 0, 1);
+    mark_player_move(&game, 4, 1);
+    mark_player_move(&game, 8, 1);
     print_board(&game);
-    
-    int usr_cell = get_user_inputs();
-    printf("%d\n", usr_cell);
+    check_winner(&game, 1);
 
-    mark_player_move(&game, usr_cell, 1);
-    print_board(&game);
-
-
-
+    return 0;
 }
 
 // Initalize the game
@@ -42,9 +42,27 @@ void game_init(Game *game) {
     memset(game->board, 0, sizeof(game->board));
     game->player_bitmask[0] = 0b000000000;
     game->player_bitmask[1] = 0b000000000;
-    game->player = BOARD_P1;
+    game->current_player = BOARD_P1;
+
+    // Wining masks
+    game->wining_masks[0] = 0b111000000;
+    game->wining_masks[1] = 0b000111000;
+    game->wining_masks[2] = 0b000000111;
+
+    game->wining_masks[3] = 0b100100100;
+    game->wining_masks[4] = 0b010010010;
+    game->wining_masks[5] = 0b001001001;
+
+    game->wining_masks[6] = 0b100010001;
+    game->wining_masks[7] = 0b001010100;
 }
 
+// Game loop
+int game_loop(Game *game) {
+
+}
+
+// Print the entire boards
 void print_board(Game *game) {
     // Loop through the board row - col
     for (int i = 0; i < 9; i++) {
@@ -57,6 +75,7 @@ void print_board(Game *game) {
     printf("\n\n");
 }
 
+// Move according to player input
 int mark_player_move(Game *game, int cell, int player) {
     int cell_bin = 8 - cell;
     // Check if the cell is alrady occupied
@@ -67,6 +86,7 @@ int mark_player_move(Game *game, int cell, int player) {
     return 1; 
 }
 
+// Get user inputs about which cell to play
 int get_user_inputs() {
     int is_valid_input = 0;
     int cell;
@@ -86,4 +106,16 @@ int get_user_inputs() {
         is_valid_input = 1;
     }
     return cell;
+}
+
+// Check if the provivded usser have won
+int check_winner(Game *game, int player) {
+    for (int i = 0; i < 8; i++) {
+        if ((game->player_bitmask[player-1] & game->wining_masks[i]) == game->wining_masks[i]) {
+            printf("%d won\n", player);
+            return 1;
+        }
+    }
+    printf("%i not won\n", player);
+    return 0;
 }
