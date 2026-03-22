@@ -18,6 +18,7 @@ enum{
 
 
 void game_init(Game *game);
+int game_loop(Game *game);
 void print_board(Game *game);
 int mark_player_move(Game *game, int cell, int player);
 int get_user_inputs();
@@ -28,11 +29,7 @@ int main() {
     Game game;
     game_init(&game);
 
-    mark_player_move(&game, 0, 1);
-    mark_player_move(&game, 4, 1);
-    mark_player_move(&game, 8, 1);
-    print_board(&game);
-    check_winner(&game, 1);
+    game_loop(&game);
 
     return 0;
 }
@@ -59,7 +56,23 @@ void game_init(Game *game) {
 
 // Game loop
 int game_loop(Game *game) {
+    print_board(game);
+    int runnung = 1;
 
+    while (runnung) {
+        // Get player input
+        printf("Player %d playing.\n", game->current_player);
+        int player_cell = get_user_inputs();
+        mark_player_move(game, player_cell,game->current_player);
+        print_board(game);
+
+        if (check_winner(game, game->current_player)) {
+           printf("Player %d has won!!!\n", game->current_player);
+           runnung = 0;
+           return 0; 
+        }
+        game->current_player = (game->current_player == 1)? 2 : 1;
+    }
 }
 
 // Print the entire boards
@@ -112,10 +125,8 @@ int get_user_inputs() {
 int check_winner(Game *game, int player) {
     for (int i = 0; i < 8; i++) {
         if ((game->player_bitmask[player-1] & game->wining_masks[i]) == game->wining_masks[i]) {
-            printf("%d won\n", player);
             return 1;
         }
     }
-    printf("%i not won\n", player);
     return 0;
 }
