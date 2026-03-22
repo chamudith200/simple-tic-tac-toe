@@ -27,7 +27,7 @@ Player need to enter the row and column in order divided by a space,
 Enter: 1 2
 ```
 This will draw the player's symbol in the coresponding cell.
-If there's a winning move the winner will be seleced and the the game will stop.
+If there's a winning move the winner will be seleced and the game will stop.
 ``` text
 Enter: 3 2
 O X . 
